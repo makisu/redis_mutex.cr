@@ -8,18 +8,18 @@ class RedisMutex::Lock
   end
 
   def create_lock_threshold
-    (Time.now + @max_locking_time).epoch
+    (Time.utc + @max_locking_time).to_unix
   end
 
   def try_to_lock
     while @redis.setnx(key, create_lock_threshold.to_s) == 0
       stored_value = TimeParser.parse(@redis.get(key))
-      if Time.now - stored_value >= @max_locking_time
+      if Time.utc - stored_value >= @max_locking_time
         new_lock_threshold = create_lock_threshold
         old_value = @redis.getset(key, new_lock_threshold.to_s)
         old_time = TimeParser.parse(old_value)
 
-        if Time.now - old_time >= @max_locking_time
+        if Time.utc - old_time >= @max_locking_time
           break
         end
 
