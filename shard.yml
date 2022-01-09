@@ -8,6 +8,6 @@ dependencies:
   redis:
     github: stefanwille/crystal-redis
 
-crystal: 0.23.1
+crystal: ">= 1.0.0"
 
 license: MIT
