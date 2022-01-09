@@ -7,7 +7,7 @@ end
 describe RedisMutex do
   it "works" do
     50.times do
-      start_time = Time.now
+      start_time = Time.utc
       channel = Channel(Int32).new
 
       spawn do
