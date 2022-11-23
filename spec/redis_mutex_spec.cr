@@ -41,7 +41,7 @@ describe RedisMutex do
 
       spawn do
         RedisMutex::Lock.new("MY_KEY", max_locking_time: max_locking_time,
-redis: pooled_client).run do
+          redis: pooled_client).run do
           sleep 0.2
           channel.send(1)
         end
@@ -50,8 +50,7 @@ redis: pooled_client).run do
       sleep 0.1
 
       spawn do
-        RedisMutex.run("MY_KEY", max_locking_time: max_locking_time, redis:
-pooled_client) do
+        RedisMutex.run("MY_KEY", max_locking_time: max_locking_time, redis: pooled_client) do
           channel.send(2)
         end
       end

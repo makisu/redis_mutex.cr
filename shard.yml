@@ -6,7 +6,8 @@ authors:
 
 dependencies:
   redis:
-    github: stefanwille/crystal-redis
+    github: jgaskins/redis
+    version: ~> 0.6.1
 
 crystal: ">= 1.0.0"
 
