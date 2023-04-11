@@ -4,7 +4,7 @@ require "./time_parser"
 class RedisMutex::Lock
   property key
 
-  def initialize(@key : String, @max_locking_time : Time::Span = RedisMutex::MAX_LOCKING_TIME, @redis : Redis::Client)
+  def initialize(@key : String, @redis : Redis::Client, @max_locking_time : Time::Span = RedisMutex::MAX_LOCKING_TIME)
   end
 
   def create_lock_threshold
