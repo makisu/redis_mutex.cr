@@ -11,8 +11,7 @@ describe RedisMutex do
       channel = Channel(Int32).new
 
       spawn do
-        RedisMutex::Lock.new("MY_KEY").run do
-          sleep 0.2
+        RedisMutex::Lock.new("MY_KEY", redis: Redis::Client.from_env("REDIS_URL")).run do
           channel.send(1)
         end
       end
@@ -20,7 +19,7 @@ describe RedisMutex do
       sleep 0.1
 
       spawn do
-        RedisMutex.run("MY_KEY") do
+        RedisMutex.run("MY_KEY", redis: Redis::Client.from_env("REDIS_URL")) do
           channel.send(2)
         end
       end
@@ -35,14 +34,13 @@ describe RedisMutex do
   it "works with Redis::PooledClient" do
     50.times do
       max_locking_time = 2.seconds
-      pooled_client = Redis::PooledClient.new(url: "redis://localhost:6379/0")
+      pooled_client = Redis::Client.new(URI.parse("#{ENV["REDIS_URL"]}/0"))
       start_time = Time.utc
       channel = Channel(Int32).new
 
       spawn do
         RedisMutex::Lock.new("MY_KEY", max_locking_time: max_locking_time,
           redis: pooled_client).run do
-          sleep 0.2
           channel.send(1)
         end
       end
@@ -63,11 +61,11 @@ describe RedisMutex do
   end
 
   it "clears token on exception" do
-    redis = Redis.new
+    redis = Redis::Client.from_env("REDIS_URL")
     redis.get("MY_KEY").should eq nil
     expect_raises(CustomException) do
       begin
-        RedisMutex::Lock.new("MY_KEY").run { raise CustomException.new }
+        RedisMutex::Lock.new("MY_KEY", redis: redis).run { raise CustomException.new }
       ensure
         redis.get("MY_KEY").should eq nil
       end
